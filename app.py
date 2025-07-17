@@ -70,6 +70,9 @@ def update_user(user_id):
     data = request.json
     user = User.query.get(user_id)
     
+    if user_id != current_user.id and current_user.role == "user":
+        return jsonify({'message': 'You cannot update another user\'s account'}), 403
+    
     if user:
         username = data.get('username')
         password = data.get('password')
@@ -88,6 +91,9 @@ def update_user(user_id):
 @login_required 
 def delete_user(user_id):
     user = User.query.get(user_id)
+    
+    if current_user.role != "admin":
+        return jsonify({'message': 'You do not have permission to delete users'}), 403
     
     if user_id == current_user.id:
         return jsonify({'message': 'You cannot delete your own account'}), 403
